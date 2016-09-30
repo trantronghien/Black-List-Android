@@ -1,0 +1,30 @@
+<resources xmlns:color="http://schemas.android.com/tools">
+    <string name="app_name">Black List</string>
+    <string name="slide_title">Black List</string>
+    <string name="slide_introduce">Devoloped By Android Team Of Science And Technology , Industry And Trade Colleges</string>
+
+    <!-- String Dialog -->
+    <string name="discard_dialog_title">Cấu hình</string>
+    <string name="discard_dialog_message">Xóa mục đã chọn?</string>
+    <string name="discard_dialog_button_ok">Ừ</string>
+    <string name="discard_dialog_button_cancel">Hủy Bỏ</string>
+
+    <string name="action_exit">Thoát</string>
+
+    <!-- help -->
+    <!-- <string name="text_help_blacklist">Click + button to add caller.</string>
+    <string name="text_help_log_blocked">No blocked number listed yet.</string>  -->
+    <string name="text_help_blacklist">Nhấn + để thêm số vào số cần chặn.</string>
+    <string name="text_help_log_blocked">Chưa có số nào trong mục nhật ký đã chặn .</string>
+
+    <!-- $about -->
+    <string name="text_introduce_about_fragment">Ứng dụng được phát triển bởi nhóm Android club khoa học công nghệ .
+         member development Trần Trọng Hiến , Mọi Ý khiến đóng góp
+        <a href="mailto:trantronghienit85@gmail.com?Subject=Hello%20again" >trantronghienit85@gmail.com </a>
+    </string>
+    <string name="general_about_title">Giới Thiệu Về Chúng Tôi</string>
+
+    <string name="msgPermission">Bạn cần cấp cho ứng dụng để đảm bảo ứng dụng hoạt động </string>
+
+
+</resources>

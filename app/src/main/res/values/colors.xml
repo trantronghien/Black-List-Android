@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#00796B</color>
+    <color name="colorAccent">#ea8108</color>
+    <color name="bg_screen_wecome">#00796B</color>
+
+    <!-- set Color  -->
+    <color name="textColor">#dd000000</color>
+    <color name="textColorSecondary">#89000000</color>
+    <color name="colorBackgroundNormal">#ffffff</color>
+    <color name="colorBackgroundPressed">#eceff1</color>
+    <color name="colorRound">#CDDC39</color>
+    <color name="colorLabel">#558B2F</color>
+</resources>
