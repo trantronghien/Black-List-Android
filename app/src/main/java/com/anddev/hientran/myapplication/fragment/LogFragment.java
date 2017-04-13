@@ -69,6 +69,7 @@ public class LogFragment extends Fragment implements IBlockedListView {
         LogAdapter mAdapter = new LogAdapter(blockedListPresenter.onFetchClick(), getActivity());
         recyclerView.setAdapter(mAdapter);
         setEmptyMessage(blockedListPresenter.onFetchClick().size());
+
         mAdapter.setOnDataChangeListener(new LogAdapter.OnDataChangeListener() {
             @Override
             public void onDataChanged(int size) {

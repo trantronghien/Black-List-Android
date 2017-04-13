@@ -48,7 +48,6 @@ public class BlockingProcessReceiver extends BroadcastReceiver {
         // nếu không phải trang thái điện thoại thì bỏ qua
         if (!intent.getAction().equals("android.intent.action.PHONE_STATE"))
             return;
-            // Else, try to do some action
         else {
             Log.d("check status call" , "đang có cuộc gọi ");
             // trang thái cuộc gọi đang chuông

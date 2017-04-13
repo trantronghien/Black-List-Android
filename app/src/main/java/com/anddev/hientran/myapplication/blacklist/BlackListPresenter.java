@@ -1,7 +1,5 @@
 package com.anddev.hientran.myapplication.blacklist;
 
-import android.view.View;
-
 import com.anddev.hientran.myapplication.interfaces.IBlacklistView;
 import com.anddev.hientran.myapplication.models.MobileData;
 
@@ -13,8 +11,8 @@ import java.util.ArrayList;
 
 
 public class BlackListPresenter {
-    IBlacklistView blacklistView;
-    BlackListService blackListService;
+    private IBlacklistView blacklistView;
+    private BlackListService blackListService;
 
     public BlackListPresenter(IBlacklistView blacklistView, BlackListService blackListService) {
         this.blacklistView = blacklistView;
@@ -25,6 +23,6 @@ public class BlackListPresenter {
     public ArrayList<MobileData> onSaveClick() {
         String smsName = blacklistView.getSmsName();
         String smsNumber = blacklistView.getSmsNumber();
-        return blackListService.getSmsInfo();
+        return blackListService.fetchBlackList();
     }
 }

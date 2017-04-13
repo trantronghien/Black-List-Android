@@ -23,11 +23,12 @@ import java.util.ArrayList;
  */
 
 public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.ViewHolder> {
-    private ArrayList<MobileData> mDataset = new ArrayList<>();
+
+    private ArrayList<MobileData> mDataset;
     private Context context;
 
     protected static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
+
         public TextView mTextView;
         public TextView mTextDesc;
         public ImageButton btnDelete;
@@ -41,9 +42,6 @@ public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.View
 
     public BlackListAdapter(ArrayList<MobileData> myDataset, Context context) {
         mDataset = myDataset;
-//        for (int i = 0 ; i < getItemCount() ; i++){
-//            Log.i("itemData" , "BlackListAdapter ,Đưa vào Adapter Constructor " + mDataset.get(i).getMobileNumber());
-//        }
         this.context = context;
     }
 
@@ -56,7 +54,6 @@ public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.View
         return vh;
     }
 
-    // FIXME: 9/29/2016 không chạy vào onBindViewHolder khi nhấn add
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         Log.i("itemData" , "BlackListAdapter , đưa vào item RecycleView " + mDataset.get(position).getMobileNumber());
@@ -66,16 +63,16 @@ public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.View
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(context)
-                        .setTitle("Xóa")
-                        .setMessage("Bạn có thực sự muốn xóa không ?")
+                        .setTitle(context.getString(R.string.title_delete_item))
+                        .setMessage(context.getString(R.string.msg_delete_item))
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(context.getString(R.string.discard_dialog_button_ok), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 deleteItem(position);
                                 doButtonOneClickActions();
                             }
                         })
-                        .setNegativeButton("NO", null).show();
+                        .setNegativeButton(context.getString(R.string.discard_dialog_button_no), null).show();
             }
         });
     }
@@ -95,10 +92,14 @@ public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.View
         return mDataset.size();
     }
 
+    public MobileData getItem(int position){
+        return mDataset.get(position);
+    }
 
     private void doButtonOneClickActions() {
         if (mOnDataChangeListener != null) {
             mOnDataChangeListener.onDataChanged(mDataset.size());
+            notifyDataSetChanged();
         }
     }
 

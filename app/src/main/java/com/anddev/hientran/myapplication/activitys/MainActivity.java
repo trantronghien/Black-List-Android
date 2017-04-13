@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -14,12 +16,14 @@ import android.provider.CallLog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,19 +38,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anddev.hientran.myapplication.R;
-import com.anddev.hientran.myapplication.adapters.BlackListAdapter;
 import com.anddev.hientran.myapplication.adapters.LogNumberAdapter;
 import com.anddev.hientran.myapplication.adapters.PageFragmentAdapter;
-import com.anddev.hientran.myapplication.blacklist.BlackListPresenter;
 import com.anddev.hientran.myapplication.blacklist.BlackListService;
 import com.anddev.hientran.myapplication.databases.CommonDbMethod;
 
 import com.anddev.hientran.myapplication.fragment.BlackListFragment;
-import com.anddev.hientran.myapplication.fragment.LogFragment;
 import com.anddev.hientran.myapplication.inbox.InboxService;
 import com.anddev.hientran.myapplication.models.MobileData;
 import com.anddev.hientran.myapplication.models.NumberData;
-import com.anddev.hientran.myapplication.util.UtilityMethod;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,9 +55,12 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
-    public FloatingActionButton floatbtnadd;
-    Activity activity;
-    Context context;
+    private FloatingActionButton floatbtnadd;
+    private Activity activity;
+    private Context context;
+    private Resources resources;
+    private String titleAction;
+    private BlackListFragment blackListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +68,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         activity = MainActivity.this;
         context = MainActivity.this;
-        // giao dịch fragment
-
-
+        resources = context.getResources();
+        titleAction = resources.getString(R.string.title_action);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(new PageFragmentAdapter(getFragmentManager(), MainActivity.this));
-        viewPager.setCurrentItem(0, true);  // xét vị trí tab mặc định khi chương trình chạy
+        viewPager.setCurrentItem(0);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -99,13 +101,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+
+
         // TabLayout dùng để xet tile tab
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        blackListFragment = new BlackListFragment();
+
         floatbtnadd = (FloatingActionButton) findViewById(R.id.fabtn_add);
         floatbtnadd.setOnClickListener(this);
     }
+
 
     // onclick addButton
     @Override
@@ -127,14 +134,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setIcon(R.drawable.about);
-        dialog.setTitle("Thêm Số Vào Danh Sách Đen");
-        String[] item_dialog = {"  Từ Tin Nhắn", "  Từ Nhật Ký Cuộc Gọi", "  Tự Nhập"};
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_selectable_list_item, item_dialog);
-//            arrayAdapter.add("     From Inbox");
-//            arrayAdapter.add("     From Log");
-//            arrayAdapter.add("     Manual Entry");
-
-
+        dialog.setTitle(R.string.title_dialong);
+        String[] item_dialog = resources.getStringArray(R.array.item_dialog);
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_selectable_list_item, item_dialog);
         dialog.setNegativeButton(R.string.discard_dialog_button_cancel,
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -147,13 +149,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        String canelButton = resources.getString(R.string.button_cancel);
                         if (which == 0) {
-                            openDialogInbox("Hủy Bỏ");
+                            openDialogInbox(canelButton);
                         } else if (which == 1) {
-                            openDialogLog("Hủy Bỏ");
+                            openDialogLog(canelButton);
                         } else if (which == 2) {
-                            openManualEntryDialog("Number", "Thêm", "Hủy Bỏ");
+                            openManualEntryDialog("Number", resources.getString(R.string.button_add), canelButton);
                         }
                     }
                 });
@@ -161,8 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // nhập số bằng tay
-    String titleAction = "Danh Sách Chặn";
-    ArrayList<MobileData> data = new ArrayList<>();
     private void openManualEntryDialog(String message, String okButton, String cancelButton) {
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -181,13 +181,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 new CommonDbMethod(context).addToNumberBlacklist("", editText.getText().toString().trim());
                 activity.setTitle(titleAction);
                 dialog.dismiss();
-                // FIXME: 9/28/2016
-                data = new BlackListService().getSmsInfo();
-                new BlackListAdapter(data , context);
-
+                ArrayList<MobileData> data = new BlackListService().fetchBlackList();
+                // FIXME: 4/12/2017 khi nhấn add button thì làm sao refresh data cho recycleview bên blackListFragment
+                blackListFragment.updateListView(data);
             }
         });
 
@@ -237,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                // FIXME: 4/12/2017 syns data when change
                 new CommonDbMethod(context).addToNumberBlacklist(mobileDatas.get(position).getSmsThreadNo(), numberDatas.get(position).getSenderNumber());
                 activity.setTitle(titleAction);
                 dialog.dismiss();
@@ -248,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(View v) {
                 dialog.dismiss();
             }
-
         });
 
         dialog.show();
@@ -267,12 +267,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LogNumberAdapter inboxNumberAdapter = new LogNumberAdapter(activity, getCallDetails());
         btnCancel.setText(cancelButton);
         listView.setAdapter(inboxNumberAdapter);
-        view.setText("Nhật Ký");
+        view.setText(R.string.title_logcall);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                // FIXME: 4/12/2017 syns data when change
                 new CommonDbMethod(context).addToNumberBlacklist(getCallDetails().get(position).getSenderNumber(), getCallDetails().get(position).getSenderNumber());
-                // UtilityMethod.blackListFragment(activity);
                 activity.setTitle(titleAction);
                 dialog.dismiss();
             }
@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             StringBuffer sb = new StringBuffer();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(activity, "Quyền chưa được cấp", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, resources.getString(R.string.permission_not_granted), Toast.LENGTH_LONG).show();
             }
             Cursor managedCursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, CallLog.Calls.DATE + " DESC");
             int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
@@ -329,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     sb.append("\n Phone Number:--- " + phNumber + " \n Call Type:--- " + dir + " \n Call Date:--- " + callDayTime + " \n Call duration in sec :--- " + callDuration);
                     sb.append("\n----------------------------------");
                 }
-
             }
             managedCursor.close();
         } catch (Exception e) {
@@ -360,29 +359,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    // ẩn hiện menu
-//    @Override
-//    public void onPrepareOptionsMenu(Menu menu) {
-//        super.onPrepareOptionsMenu(menu);
-//        menu.findItem(R.id.filter).setVisible(true);
-//        menu.findItem(R.id.export).setVisible(true);
-//        menu.findItem(R.id.import0).setVisible(true);
-//        activity.setOnMenuItemClickListener(this);
-//    }
-
-
     // dialog exit
     protected void openDialogExit() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Bạn Thực Sự Muốn Thoát ?");
-        builder.setNegativeButton("Cannel", new DialogInterface.OnClickListener() {
+        builder.setTitle(resources.getString(R.string.title_dialog_exit));
+        builder.setNegativeButton(resources.getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // do notthing
                 dialog.dismiss();
             }
         });
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(resources.getString(R.string.discard_dialog_button_ok), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 System.exit(0);
@@ -391,4 +378,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         builder.show();
     }
+
 }

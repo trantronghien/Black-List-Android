@@ -11,8 +11,8 @@ import java.util.ArrayList;
  * Created by HienTran on 9/17/2016.
  */
 public class BlockedListPresenter {
-    IBlockedListView blacklistView;
-    BlockedListService blackListService;
+    private IBlockedListView blacklistView;
+    private BlockedListService blackListService;
 
     public BlockedListPresenter(IBlockedListView blacklistView, BlockedListService blackListService) {
         this.blacklistView = blacklistView;

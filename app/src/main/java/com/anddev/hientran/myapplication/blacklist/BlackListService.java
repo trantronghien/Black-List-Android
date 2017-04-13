@@ -15,20 +15,13 @@ import java.util.ArrayList;
 
 public class BlackListService {
 
-    public ArrayList<MobileData> getSmsInfo() {
-        return fetchBlackList();
-    }
-
-    private ArrayList<MobileData> fetchBlackList() {
+    public ArrayList<MobileData> fetchBlackList() {
         ArrayList<MobileData> mobileDatas = new ArrayList<>();
-
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(CommonDbMethod.mPATH , null, SQLiteDatabase.OPEN_READWRITE);
 
             //Check, if the "fromAddr" exists in the BlackListDB
             Cursor c = db.query("SMS_BlackList", null, null, null, null, null, null);
-            //Log.i("ifBlockedDeleteSMS", "c.moveToFirst(): " + c.moveToFirst() + "  c.getCount(): " + c.getCount());
-
             if (c.moveToFirst() && c.getCount() > 0) {
                 while (!c.isAfterLast()) {
                     MobileData mobileData = new MobileData();
@@ -43,7 +36,6 @@ public class BlackListService {
             db.close();
         } catch (Exception e) {
         }
-        Log.i("BlackListService" , "tổng phần tử trong list: " + mobileDatas.size());
         return mobileDatas;
     }
 }

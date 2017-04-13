@@ -28,7 +28,7 @@ import java.util.ArrayList;
 //lấy dữ liệu từ cuộc gọi đã chặn đưa vào RecyclerView tab log (Log = Blocked)
 public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
-    private ArrayList<MobileData> mDataset = new ArrayList<>();
+    private ArrayList<MobileData> mDataset;
     private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

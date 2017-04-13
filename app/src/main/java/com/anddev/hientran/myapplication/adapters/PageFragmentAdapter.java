@@ -15,7 +15,6 @@ import com.anddev.hientran.myapplication.fragment.LogFragment;
  * Created by HienTran on 9/23/2016.
  */
 
-//todo Adapter Quản lý tab và fragment
 public class PageFragmentAdapter extends FragmentPagerAdapter {
 
     private String[] tabTitles;
@@ -23,7 +22,7 @@ public class PageFragmentAdapter extends FragmentPagerAdapter {
 
     public PageFragmentAdapter(FragmentManager fm, Context context) {
         super(fm);
-        // add frament tab ở đây
+
         tabTitles = context.getResources().getStringArray(R.array.tabTitles);
         fragments = new Fragment[]{new BlackListFragment(), new LogFragment() , new AboutFragments()};
     }

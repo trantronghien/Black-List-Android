@@ -1,5 +1,6 @@
 package com.anddev.hientran.myapplication.databases;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.anddev.hientran.myapplication.R;
+import com.anddev.hientran.myapplication.adapters.BlackListAdapter;
 import com.anddev.hientran.myapplication.models.MobileData;
 
 import java.util.ArrayList;
@@ -17,7 +20,8 @@ import java.util.Locale;
  */
 
 public class CommonDbMethod {
-    Context context;
+    private Context context;
+
     // path databases
     public static final String mPATH = "/data/data/com.anddev.hientran.myapplication/databases/BlackListDB.db";
 
@@ -26,6 +30,7 @@ public class CommonDbMethod {
     }
 
     // add blacklist
+    @SuppressLint("StringFormatInvalid")
     public void addToNumberBlacklist(String name, String number) {
         if (number.length() == 0) {
             Toast.makeText(context, "Please fill up both the fields", Toast.LENGTH_LONG).show();
@@ -48,28 +53,16 @@ public class CommonDbMethod {
             Log.d("CommonDbMethod" , "insert number: " + number_stadand);
 
             ContentValues values = new ContentValues();
-            // values.put("sms_id", id);
             values.put("names", name);
             values.put("numbers", number_stadand);
             //values.put("body", body);
 
             db.insert("SMS_BlackList", null, values);
-
-        /*if (db.insert("SMS_BlackList", null, values) == -1){
-            Log.d("addToSMS_BlackList", "3: blockingCodeForSMS ");
-            Toast.makeText(context, name + " already exist in database\n Please try a new name!!", Toast.LENGTH_LONG).show();
-            db.close();
-            return;
-        }*/
-
             Log.d("addToSMS_BlackList", "4: blockingCodeForSMS ");
-            Log.d("addToSMS_BlackList", "5: blockingCodeForSMS ");
-
             db.close();
-            Toast.makeText(context, number + " is added to blacklist ", Toast.LENGTH_LONG).show();
-
+            Toast.makeText(context, context.getResources().getString(R.string.add_to_blacklist_success , number), Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            Toast.makeText(context, "Error: Can't add number" + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getResources().getString(R.string.add_to_blacklist_error , e.getMessage()), Toast.LENGTH_LONG).show();
         }
     }
 

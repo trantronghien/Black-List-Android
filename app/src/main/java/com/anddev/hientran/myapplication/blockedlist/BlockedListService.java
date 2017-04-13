@@ -38,15 +38,12 @@ public class BlockedListService {
                     c.moveToNext();
                 }
                 c.close();
-
             }
-
             db.close();
 
         } catch (Exception e) {
 
         }
-
         return mobileDatas;
     }
 }
