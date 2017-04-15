@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.AudioManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.telephony.TelephonyManager;
@@ -25,22 +26,24 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import static com.anddev.hientran.myapplication.databases.CommonDbMethod.TABLE_BLOCKED_LIST;
+
 /**
  * Created by HienTran on 9/23/2016.
  */
 
 public class BlockingProcessReceiver extends BroadcastReceiver {
 
-    Integer notificationId = 1207, requestId = 1208;
-    String msgBody;
-    Context context;
+    private Context context;
+    private final String EDITOR = "Call" ;
+    private final String TAG_LOG = "BlockingProcessReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
         this.context = context;
         // SharedPreferences.Editor đổi tượng Editor để cho phép chỉnh sửa dữ liệu
-        SharedPreferences.Editor editor = context.getSharedPreferences("L", Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(EDITOR , Context.MODE_PRIVATE).edit();
 
         ITelephony telephonyService;
         TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -52,7 +55,6 @@ public class BlockingProcessReceiver extends BroadcastReceiver {
             Log.d("check status call" , "đang có cuộc gọi ");
             // trang thái cuộc gọi đang chuông
             if(telephony.getCallState() == telephony.CALL_STATE_RINGING) {
-                                                                        // tệp tin lưu trạng thái phần mở rộng là xml ,
                 SharedPreferences prefs = context.getSharedPreferences("status_file", Context.MODE_PRIVATE);
 
                 int idName = prefs.getInt("idName", 0); //0 is the default value.
@@ -62,12 +64,11 @@ public class BlockingProcessReceiver extends BroadcastReceiver {
                     Log.i("Ringing" , ".......");
                     // Lấy Số cuộc gọi đến
                     String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-                    Toast.makeText(context, "" + number + " đang bị chặn", Toast.LENGTH_SHORT).show();
                     SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy hh:mm:ss");
-                    // biến lấy thời gian
+
                     Calendar c = Calendar.getInstance();
                     String formattedDate = df.format(c.getTime());
-                    checkBlackList(number, null, context, formattedDate);
+                    checkBlackList(number, context, formattedDate);
                     Log.i("income number", "" + number);
                 }
                 // trạng thái cuộc gọi không hoạt động
@@ -106,48 +107,55 @@ public class BlockingProcessReceiver extends BroadcastReceiver {
             db.setVersion(1);
             db.setLocale(Locale.getDefault());
             db.setLockingEnabled(true);
-            db.execSQL("create table IF NOT EXISTS sms_blocked(id integer primary key autoincrement, names varchar(20), numbers varchar(20), body varchar(250))");
+            db.execSQL("create table IF NOT EXISTS "+ TABLE_BLOCKED_LIST +"(id integer primary key autoincrement, names varchar(20), numbers varchar(20), body varchar(250))");
 
-            // Insert the "PhoneNumbers" into database-table, "SMS_BlackList"
             ContentValues values = new ContentValues();
-            values.put("names", number);
+            values.put("names", name);
             values.put("numbers", number);
             values.put("body", formattedDate);
-            db.insert("sms_blocked", null, values);
+            db.insert(CommonDbMethod.TABLE_BLOCKED_LIST, null, values);
             db.close();
 
         } catch (Exception e) {
-            Log.d("addToSMS_BlackList", "***" + e.getMessage());
             Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG).show();
 
         }
 
     }
 
-    private void checkBlackList(final String mobileNumber, final Long threadId, final Context context, String createdDate) {
+    /**
+     * kiểm tra số truyền vào có nằm trong blocked list hay không nếu có dừng
+     * cuộc gọi luư log và push thông báo
+     * @param mobileNumber
+     * @param context
+     * @param createdDate
+     */
+    private void checkBlackList(final String mobileNumber, final Context context, String createdDate) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(CommonDbMethod.mPATH, null, SQLiteDatabase.OPEN_READWRITE);
 
             //Kiểm tra số đó có nằm trong database không
-            Cursor c = db.query("SMS_BlackList", null, "numbers=?", new String[] { mobileNumber }, null, null, null);
-            Log.i("checkBlackList", "c.moveToFirst(): " + c.moveToFirst() + "  c.getCount(): " + c.getCount());
+            Cursor c = db.query(CommonDbMethod.TABLE_BLACK_LIST, null, "numbers=?", new String[] { mobileNumber }, null, null, null);
+//            Cursor cursor = db.query(CommonDbMethod.TABLE_BLACK_LIST, null, null , null , null, null, null);
+
 
             if (c.moveToFirst() && c.getCount() > 0) {
-                //AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                //manager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-                disconnectPhoneiTelephony(context); // call disconnect
-                saveIncomingBlockedNumber(context, "Call blocked ", mobileNumber, createdDate);
+                String name = c.getString(c.getColumnIndex("names"));
+                AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                manager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                disconnectPhoneiTelephony(context);
+                saveIncomingBlockedNumber(context, name , mobileNumber, createdDate);
                 pushNotification(mobileNumber);
 
-                //manager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                manager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 
                 c.close();
                 db.close();
+                Toast.makeText(context, "" + mobileNumber + " đang bị chặn", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Log.d("SMSBlockingProcess", " checkBlackList Ended");
         } catch (Exception e){
-            Log.e("SMSBlocking excep", " " + e.getMessage());
+            Log.e("SMSBlocking", " " + e.getMessage());
         }
 
     }

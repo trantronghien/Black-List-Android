@@ -6,25 +6,36 @@
     <!-- String Dialog -->
     <string name="discard_dialog_title">Cấu hình</string>
     <string name="discard_dialog_message">Xóa mục đã chọn?</string>
-    <string name="discard_dialog_button_ok">Ừ</string>
-    <string name="discard_dialog_button_cancel">Hủy Bỏ</string>
+    <string name="discard_dialog_button_ok">Đồng ý</string>
+    <string name="discard_dialog_button_cancel">Hủy bỏ</string>
 
     <string name="action_exit">Thoát</string>
 
-    <!-- help -->
-    <!-- <string name="text_help_blacklist">Click + button to add caller.</string>
-    <string name="text_help_log_blocked">No blocked number listed yet.</string>  -->
     <string name="text_help_blacklist">Nhấn + để thêm số vào số cần chặn.</string>
     <string name="text_help_log_blocked">Chưa có số nào trong mục nhật ký đã chặn .</string>
 
     <!-- $about -->
-    <string name="text_introduce_about_fragment">Ứng dụng được phát triển bởi nhóm Android club khoa học công nghệ .
-         member development Trần Trọng Hiến , Mọi Ý khiến đóng góp
+    <string name="text_introduce_about_fragment">Ứng dụng được phát triển bởi nhóm Android club khoa học công nghệ.
+         developer Trần Trọng Hiến , Mọi ý khiến đóng góp
         <a href="mailto:trantronghienit85@gmail.com?Subject=Hello%20again" >trantronghienit85@gmail.com </a>
     </string>
     <string name="general_about_title">Giới Thiệu Về Chúng Tôi</string>
 
-    <string name="msgPermission">Bạn cần cấp cho ứng dụng để đảm bảo ứng dụng hoạt động </string>
+    <string name="msgPermission">Bạn cần cấp quyền cho ứng dụng để đảm bảo ứng dụng hoạt động bình thuờng !! </string>
+    <string name="title_dialong">Thêm Số Vào Danh Sách Đen</string>
+    <string name="title_action">Danh Sách Chặn</string>
+    <string name="button_cancel">Hủy Bỏ</string>
+    <string name="button_add">Thêm</string>
+    <string name="title_dialog_exit">Bạn Thực Sự Muốn Thoát ?</string>
+    <string name="permission_not_granted">Bạn chưa cho phép ứng dụng đọc nhật ký cuộc gọi, xin kiểm tra lại</string>
+    <string name="msg_delete_item">Bạn có thực sự muốn xóa không ?</string>
+    <string name="title_delete_item">Xóa</string>
+    <string name="discard_dialog_button_no">Không</string>
+    <string name="add_to_blacklist_error">Lỗi: không thể add số này vào với lỗi %1$s </string>
+    <string name="add_to_blacklist_success">%1$s Đã được thêm vào danh sách chặn</string>
+    <string name="title_logcall">Nhật ký cuộc gọi</string>
+    <string name="message_dialog_delete_log">Xóa nhật ký đã chặn ?</string>
+    <string name="title_delete_log">Xóa nhật ký chặn</string>
 
 
 </resources>

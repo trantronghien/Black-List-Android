@@ -17,6 +17,9 @@ public class MobileData {
     public void setCallerName(String smsNo) {
         this.smsNo = smsNo;
     }
+    public String getCallerName(){
+        return smsNo;
+    }
 
     public String getOtherString() {
         return smsString;

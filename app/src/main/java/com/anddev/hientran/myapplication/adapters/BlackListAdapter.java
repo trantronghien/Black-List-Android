@@ -29,13 +29,14 @@ public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.View
 
     protected static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mTextView;
-        public TextView mTextDesc;
+        public TextView mTxtNumber;
+        public TextView mTxtName;
         public ImageButton btnDelete;
 
         public ViewHolder(View v) {
             super(v);
-            mTextView = (TextView) v.findViewById(R.id.person_name);
+            mTxtName = (TextView) v.findViewById(R.id.person_name);
+            mTxtNumber = (TextView) v.findViewById(R.id.person_number);
             btnDelete = (ImageButton) v.findViewById(R.id.btnDelete);
         }
     }
@@ -56,9 +57,9 @@ public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        Log.i("itemData" , "BlackListAdapter , đưa vào item RecycleView " + mDataset.get(position).getMobileNumber());
-        holder.mTextView.setText("" + mDataset.get(position).getMobileNumber());
-
+        MobileData mobileData = mDataset.get(position);
+        holder.mTxtNumber.setText(mobileData.getMobileNumber().toString());
+        holder.mTxtName.setText(mobileData.getCallerName().toString());
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,7 +80,7 @@ public class BlackListAdapter extends RecyclerView.Adapter<BlackListAdapter.View
 
     public void deleteItem(int position) {
         CommonDbMethod commonDbMethod = new CommonDbMethod(context);
-        commonDbMethod.deleteBlackListNumber(mDataset.get(position).getMobileNumber(), "SMS_BlackList");
+        commonDbMethod.deleteBlackListNumber(mDataset.get(position).getMobileNumber(), CommonDbMethod.TABLE_BLACK_LIST);
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, mDataset.size());

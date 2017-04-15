@@ -21,7 +21,7 @@ public class BlackListService {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(CommonDbMethod.mPATH , null, SQLiteDatabase.OPEN_READWRITE);
 
             //Check, if the "fromAddr" exists in the BlackListDB
-            Cursor c = db.query("SMS_BlackList", null, null, null, null, null, null);
+            Cursor c = db.query(CommonDbMethod.TABLE_BLACK_LIST, null, null, null, null, null, null);
             if (c.moveToFirst() && c.getCount() > 0) {
                 while (!c.isAfterLast()) {
                     MobileData mobileData = new MobileData();

@@ -80,6 +80,11 @@ public class LogFragment extends Fragment implements IBlockedListView {
         return rootView;
     }
 
+    public void reloadWhenDataChanges(){
+        //snippet will call the onCreateView Method of the Fragment.
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+
     @Override
     public String getSmsName() {
         return null;

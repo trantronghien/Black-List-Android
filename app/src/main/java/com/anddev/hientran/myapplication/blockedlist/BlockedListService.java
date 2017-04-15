@@ -2,6 +2,7 @@ package com.anddev.hientran.myapplication.blockedlist;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 
 import com.anddev.hientran.myapplication.databases.CommonDbMethod;
@@ -14,20 +15,14 @@ import java.util.ArrayList;
  */
 public class BlockedListService {
 
-    public ArrayList<MobileData> getSmsInfo() {
-        return fetchBlockedList();
-    }
 
-    private ArrayList<MobileData> fetchBlockedList() {
+    private final String TAG_LOG = "BlockedListService";
+    public ArrayList<MobileData> fetchBlockedList() {
         ArrayList<MobileData> mobileDatas = new ArrayList<>();
-
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(CommonDbMethod.mPATH, null, SQLiteDatabase.OPEN_READWRITE);
 
-            //Check, if the "fromAddr" exists in the BlackListDB
-            Cursor c = db.query("sms_blocked", null, null, null, null, null, " id DESC");
-            //Log.i("ifBlockedDeleteSMS", "c.moveToFirst(): " + c.moveToFirst() + "  c.getCount(): " + c.getCount());
-
+            Cursor c = db.query(CommonDbMethod.TABLE_BLOCKED_LIST, null, null, null, null, null, " id DESC");
             if (c.moveToFirst() && c.getCount() > 0) {
                 while (!c.isAfterLast()) {
                     MobileData mobileData = new MobileData();
@@ -42,7 +37,7 @@ public class BlockedListService {
             db.close();
 
         } catch (Exception e) {
-
+            Log.e(TAG_LOG , "không thể truy vấn log list");
         }
         return mobileDatas;
     }

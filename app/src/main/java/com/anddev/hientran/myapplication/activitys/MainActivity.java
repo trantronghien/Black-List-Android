@@ -3,20 +3,25 @@ package com.anddev.hientran.myapplication.activitys;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Build;
 import android.provider.CallLog;
+import android.provider.Contacts;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
+
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +29,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,10 +46,10 @@ import android.widget.Toast;
 import com.anddev.hientran.myapplication.R;
 import com.anddev.hientran.myapplication.adapters.LogNumberAdapter;
 import com.anddev.hientran.myapplication.adapters.PageFragmentAdapter;
-import com.anddev.hientran.myapplication.blacklist.BlackListService;
 import com.anddev.hientran.myapplication.databases.CommonDbMethod;
 
 import com.anddev.hientran.myapplication.fragment.BlackListFragment;
+import com.anddev.hientran.myapplication.fragment.LogFragment;
 import com.anddev.hientran.myapplication.inbox.InboxService;
 import com.anddev.hientran.myapplication.models.MobileData;
 import com.anddev.hientran.myapplication.models.NumberData;
@@ -76,23 +82,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setSupportActionBar(toolbar);
         }
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new PageFragmentAdapter(getFragmentManager(), MainActivity.this));
+        final PageFragmentAdapter viewAdapter = new PageFragmentAdapter(getFragmentManager(), MainActivity.this);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(viewAdapter);
         viewPager.setCurrentItem(0);
 
+        Fragment fragment = viewAdapter.getItem(viewPager.getCurrentItem());
+        if (fragment instanceof BlackListFragment) blackListFragment = (BlackListFragment) fragment;
+
+        // TabLayout dùng để xet tile tab
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
             }
 
             @Override
             public void onPageSelected(int position) {
-                if(position != 0){
-                    floatbtnadd.hide();
-                }
-                else {
-                    floatbtnadd.show();
-                }
+                if (position != 0) floatbtnadd.hide();
+                else floatbtnadd.show();
+                Fragment fragment = viewAdapter.getItem(position);
+                if (fragment instanceof LogFragment)((LogFragment) fragment).reloadWhenDataChanges();
             }
 
             @Override
@@ -101,13 +113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
-
-        // TabLayout dùng để xet tile tab
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-
-        blackListFragment = new BlackListFragment();
 
         floatbtnadd = (FloatingActionButton) findViewById(R.id.fabtn_add);
         floatbtnadd.setOnClickListener(this);
@@ -181,13 +186,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                new CommonDbMethod(context).addToNumberBlacklist("", editText.getText().toString().trim());
+                String number = editText.getText().toString().trim();
+                new CommonDbMethod(context).addToNumberBlacklist(getContactName(number), number);
+                Log.i("Number" , "ten"+ getContactName(number));
                 activity.setTitle(titleAction);
                 dialog.dismiss();
-                ArrayList<MobileData> data = new BlackListService().fetchBlackList();
-                // FIXME: 4/12/2017 khi nhấn add button thì làm sao refresh data cho recycleview bên blackListFragment
-                blackListFragment.updateListView(data);
+                blackListFragment.updateListView();
             }
         });
 
@@ -237,9 +241,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                // FIXME: 4/12/2017 syns data when change
                 new CommonDbMethod(context).addToNumberBlacklist(mobileDatas.get(position).getSmsThreadNo(), numberDatas.get(position).getSenderNumber());
                 activity.setTitle(titleAction);
+                blackListFragment.updateListView();
                 dialog.dismiss();
             }
         });
@@ -271,9 +275,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                // FIXME: 4/12/2017 syns data when change
                 new CommonDbMethod(context).addToNumberBlacklist(getCallDetails().get(position).getSenderNumber(), getCallDetails().get(position).getSenderNumber());
                 activity.setTitle(titleAction);
+                blackListFragment.updateListView();
                 dialog.dismiss();
             }
         });
@@ -334,6 +338,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e) {
         }
         return numberDatas;
+    }
+
+    public String getContactName(String phoneNumber)
+    {
+        ContentResolver cr = getApplicationContext().getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Cursor cursor = cr.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME}, null, null, null);
+        if (cursor == null)
+        {
+            return null;
+        }
+        String contactName = "Unknown";
+        if(cursor.moveToFirst())
+        {
+            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+        }
+        if(cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+        return contactName;
     }
 
     //============================================================================

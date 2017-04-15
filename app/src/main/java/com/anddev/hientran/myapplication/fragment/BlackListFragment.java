@@ -69,11 +69,10 @@ public class BlackListFragment extends Fragment implements IBlacklistView  {
     }
 
 
-    public void updateListView(ArrayList<MobileData> data) {
+    public void updateListView() {
         //snippet will call the onCreateView Method of the Fragment.
-//        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
-//        mAdapter.notifyDataSetChanged();
-        mAdapter = new BlackListAdapter(data , getActivity());
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+;
     }
 
 

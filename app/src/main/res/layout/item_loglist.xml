@@ -10,22 +10,17 @@
         android:id="@+id/cv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:foreground="?android:attr/selectableItemBackground"
         app:cardCornerRadius="4dp"
         app:cardElevation="4dp"
-        android:foreground="?android:attr/selectableItemBackground"
-        card_view:cardElevation="2dp"
         card_view:cardBackgroundColor="@android:color/white"
-        card_view:cardUseCompatPadding="true"
-        android:layout_marginLeft="@dimen/item_horizontal_margin"
-        android:layout_marginRight="@dimen/item_horizontal_margin"
-        android:layout_marginTop="@dimen/item_horizontal_margin"
-        android:layout_marginBottom="1dip"
-        >
+        card_view:cardElevation="2dp"
+        card_view:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:padding="5dp">
 
             <ImageView
                 android:id="@+id/person_photo"
@@ -33,27 +28,43 @@
                 android:layout_height="48dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:padding="10dp"
-                android:src="@drawable/icon"
+                android:layout_marginRight="16dp"
                 android:background="@drawable/circle_shape"
-                android:layout_marginRight="16dp" />
+                android:padding="10dp"
+                android:src="@drawable/icon" />
 
             <TextView
                 android:id="@+id/person_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/person_photo"
                 android:layout_toRightOf="@+id/person_photo"
                 android:text="Title"
+                android:textStyle="bold"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/person_age"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/person_name"
                 android:text="Some description goes here."
-                android:layout_toRightOf="@+id/person_photo" />
+                android:layout_below="@+id/person_number"
+                android:layout_marginTop="2dp"
+                android:layout_toRightOf="@+id/person_photo"
+                android:layout_toEndOf="@+id/person_photo"
+                android:textStyle="normal"/>
+
+            <TextView
+                android:id="@+id/person_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="italic"
+                android:layout_below="@+id/person_name"
+                android:layout_toEndOf="@+id/person_photo"
+                android:layout_toRightOf="@+id/person_photo"
+                android:layout_marginTop="2dp"
+                android:text="085275283523" />
 
         </RelativeLayout>
 

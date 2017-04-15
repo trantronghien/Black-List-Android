@@ -25,60 +25,65 @@ import java.util.ArrayList;
 /**
  * Created by HienTran on 9/24/2016.
  */
-//lấy dữ liệu từ cuộc gọi đã chặn đưa vào RecyclerView tab log (Log = Blocked)
+
 public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
     private ArrayList<MobileData> mDataset;
     private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public TextView mTextView;
-        public TextView mTextDesc;
-        public CardView cardView;
+
+        private TextView mTxtName;
+        private TextView mTxtAge;
+        private TextView mTxtNumber;
+
+        private CardView cardView;
 
         public ViewHolder(View v) {
             super(v);
-            mTextView = (TextView) v.findViewById(R.id.person_name);
-            mTextDesc = (TextView) v.findViewById(R.id.person_age);
+            mTxtName = (TextView) v.findViewById(R.id.person_name);
+            mTxtAge = (TextView) v.findViewById(R.id.person_age);
+            mTxtNumber = (TextView) v.findViewById(R.id.person_number);
             cardView = (CardView) v.findViewById(R.id.cv);
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
+
     public LogAdapter(ArrayList<MobileData> myDataset, Context context) {
         mDataset = myDataset;
         this.context = context;
     }
 
-    // Create new views (invoked by the layout manager)
+
     @Override
     public LogAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loglist, parent, false);
-        ViewHolder vh = new ViewHolder(v);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_loglist, parent, false);
+        ViewHolder vh = new ViewHolder(view);
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+
     @Override
     public void onBindViewHolder(ViewHolder holder,final int position) {
-        holder.mTextView.setText(mDataset.get(position).getMobileNumber());
-        holder.mTextDesc.setText(mDataset.get(position).getOtherString());
+        MobileData mobileData = mDataset.get(position);
+
+        holder.mTxtName.setText(mobileData.getCallerName());
+        holder.mTxtNumber.setText(mobileData.getMobileNumber());
+        holder.mTxtAge.setText(mobileData.getOtherString());
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(context)
-                        .setTitle("Delete")
-                        .setMessage("Do you really want to delete?")
+                        .setTitle(context.getResources().getString(R.string.title_delete_log))
+                        .setMessage(context.getResources().getString(R.string.message_dialog_delete_log))
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(context.getString(R.string.discard_dialog_button_ok), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 deleteLog(position);
                             }})
-                        .setNegativeButton("NO", null).show();
+                        .setNegativeButton(context.getString(R.string.discard_dialog_button_no), null).show();
             }
 
         });
@@ -86,7 +91,8 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
     }
 
     private void deleteLog(int position) {
-        new CommonDbMethod(context).deleteLogNumber(mDataset.get(position).getOtherString(), mDataset.get(position).getMobileNumber(), "sms_blocked");
+        new CommonDbMethod(context)
+                .deleteLogNumber(mDataset.get(position).getOtherString(), mDataset.get(position).getMobileNumber(), CommonDbMethod.TABLE_BLOCKED_LIST);
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, mDataset.size());
@@ -94,32 +100,6 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
     }
 
-    public void delete_thread(String thread)
-    {
-        Cursor c = context.getContentResolver().query(
-                Uri.parse("content://sms/"),new String[] {
-                        "_id", "thread_id", "address", "person", "date","body" }, null, null, null);
-
-        try {
-            while (c.moveToNext())
-            {
-                int id = c.getInt(0);
-                Log.i("ID", "***" + id);
-                String address = c.getString(2);
-                if (address.equals(thread))
-                {
-                    Log.i("OK", "***" + address);
-                    Log.i("OK ID", "***" + id);
-                    context.getContentResolver().delete(Uri.parse("content://sms/" + id), null, null);
-                }
-
-            }
-        } catch (Exception e) {
-            Log.e("DELETE EXCEPTION", "" + e.getMessage() );
-        }
-    }
-
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return mDataset.size();

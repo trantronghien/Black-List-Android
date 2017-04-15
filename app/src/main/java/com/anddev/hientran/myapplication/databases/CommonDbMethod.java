@@ -24,6 +24,10 @@ public class CommonDbMethod {
 
     // path databases
     public static final String mPATH = "/data/data/com.anddev.hientran.myapplication/databases/BlackListDB.db";
+    public static final String TABLE_BLACK_LIST = "BlackList";
+    public static final String TABLE_BLOCKED_LIST = "BlockedList"; // log call
+    public static final int IDEX_BLACKLIST_NAME = 1;
+    public static final int IDEX_BLACKLIST_NUMBER = 2;
 
     public CommonDbMethod(Context context) {
         this.context = context;
@@ -42,7 +46,7 @@ public class CommonDbMethod {
             db.setVersion(1);
             db.setLocale(Locale.getDefault());
             db.setLockingEnabled(true);
-            db.execSQL("create table IF NOT EXISTS SMS_BlackList(sms_id varchar(20), names varchar(20), numbers varchar(20) UNIQUE)");
+            db.execSQL("create table IF NOT EXISTS " +TABLE_BLACK_LIST + "(sms_id varchar(20), names varchar(255), numbers varchar(20) UNIQUE)");
 
             // sử lý number khi nếu có khoảng trắng
             String [] str = number.split("\\s+");
@@ -50,15 +54,13 @@ public class CommonDbMethod {
             for (int i = 0; i < str.length; i++) {
                 number_stadand += str[i];
             }
-            Log.d("CommonDbMethod" , "insert number: " + number_stadand);
 
             ContentValues values = new ContentValues();
             values.put("names", name);
             values.put("numbers", number_stadand);
             //values.put("body", body);
 
-            db.insert("SMS_BlackList", null, values);
-            Log.d("addToSMS_BlackList", "4: blockingCodeForSMS ");
+            db.insert(CommonDbMethod.TABLE_BLACK_LIST , null, values);
             db.close();
             Toast.makeText(context, context.getResources().getString(R.string.add_to_blacklist_success , number), Toast.LENGTH_LONG).show();
         } catch (Exception e) {

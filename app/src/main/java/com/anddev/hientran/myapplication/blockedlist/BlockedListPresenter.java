@@ -23,7 +23,7 @@ public class BlockedListPresenter {
         String smsName = blacklistView.getSmsName();
         String smsNumber = blacklistView.getSmsNumber();
 
-        return blackListService.getSmsInfo();
+        return blackListService.fetchBlockedList();
     }
 
 }
