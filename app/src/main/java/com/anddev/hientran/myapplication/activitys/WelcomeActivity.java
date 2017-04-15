@@ -27,7 +27,8 @@ public class WelcomeActivity extends AbsRuntimePermission {
                             Manifest.permission.RECEIVE_SMS,
                             Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_SMS, },
+                            Manifest.permission.READ_SMS,
+                            Manifest.permission.READ_CONTACTS, },
                     R.string.msgPermission, REQUEST_PERMISSION);
         }
         else {
